@@ -1,4 +1,9 @@
-# KingsRock Discord Bot
+<img src="./assets/image/kingsrockesports.png" width="100%"/>
+
+<p align="center"> KingsRock Official Discord Bot </p>
+<p align="center"> The Official Discord Bot of KingsRock Esports </p>
+
+# About KingsRock Discord Bot
 
 An **AI-ready, full-featured bot** built with **TypeScript**, **Lavalink**, and **Discord.js** — designed for high-performance music playback and seamless audio streaming.  
 Built by **KingsRock Management** ❤️‍🔥
@@ -197,6 +202,5 @@ Feel free to fork, extend, or remix — just give credit 🎶
 ---
 
 ## 💬 Support
-
 Need help?
-Join our Discord or open an issue on GitHub!
+Join our [Discord](https://discord.gg/PdwFwrjT5n) or open an issue on GitHub!
