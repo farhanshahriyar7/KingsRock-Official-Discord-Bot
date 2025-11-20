@@ -110,8 +110,12 @@ export async function stop(message: Message) {
         return message.reply('❌ Nothing is playing!');
     }
 
+    // Clear the queue
     player.queue.tracks.splice(0, player.queue.tracks.length);
-    await player.skip();
+
+    // Stop playback properly without causing crash
+    await player.stopPlaying();
+
     message.reply('⏹️ Stopped playback and cleared the queue!');
 }
 

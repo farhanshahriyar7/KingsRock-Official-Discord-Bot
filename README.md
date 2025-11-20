@@ -2,6 +2,7 @@
 
 <p align="center"> KingsRock Official Discord Bot </p>
 <p align="center"> The Official Discord Bot of KingsRock Esports </p>
+---
 
 # About KingsRock Discord Bot
 
