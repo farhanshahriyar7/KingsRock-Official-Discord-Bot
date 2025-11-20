@@ -68,8 +68,34 @@ export function initializeLavalink(client: Client): LavalinkManager {
                 channel.send(`🎵 Now playing: **${track.info.title}** by **${track.info.author}**`);
             }
         })
-        .on('trackEnd', (player) => {
-            console.log(`Track ended in guild ${player.guildId}`);
+        .on('trackEnd', (player, track, payload) => {
+            console.log(`Track ended in guild ${player.guildId}`, payload?.reason || '');
+        })
+        .on('trackError', (player, track, error) => {
+            console.error(`❌ Track error in guild ${player.guildId}:`, error);
+            const channel = client.channels.cache.get(player.textChannelId!);
+            if (channel && 'send' in channel) {
+                const errorMsg = error.exception?.message || error.error || 'Unknown error';
+                const trackTitle = track?.info?.title || 'Unknown track';
+                channel.send(`❌ Error playing **${trackTitle}**: ${errorMsg}\n💡 This might be due to YouTube restrictions or Lavalink server issues.`);
+            }
+        })
+        .on('trackStuck', (player, track, thresholdMs) => {
+            console.warn(`⚠️ Track stuck in guild ${player.guildId} for ${thresholdMs}ms`);
+            const channel = client.channels.cache.get(player.textChannelId!);
+            if (channel && 'send' in channel) {
+                const trackTitle = track?.info?.title || 'Unknown track';
+                channel.send(`⚠️ Track **${trackTitle}** is stuck. Skipping...`);
+            }
+            // Auto-skip stuck tracks
+            player.skip();
+        })
+        .on('playerMove', (player, oldChannel, newChannel) => {
+            console.log(`Player moved from ${oldChannel} to ${newChannel} in guild ${player.guildId}`);
+            if (!newChannel) {
+                // User disconnected the bot, destroy the player
+                player.destroy();
+            }
         })
         .on('queueEnd', (player) => {
             const channel = client.channels.cache.get(player.textChannelId!);

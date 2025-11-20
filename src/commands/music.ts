@@ -98,8 +98,17 @@ export async function skip(message: Message) {
     }
 
     const current = player.queue.current;
-    await player.skip();
-    message.reply(`⏭️ Skipped **${current.info.title}**!`);
+
+    // Check if there are more tracks in the queue or if we should just stop
+    if (player.queue.tracks.length === 0) {
+        // No more tracks, stop playback instead of skipping
+        await player.stopPlaying();
+        message.reply(`⏭️ Skipped **${current.info.title}**! No more tracks in queue.`);
+    } else {
+        // There are more tracks, skip to the next one
+        await player.skip();
+        message.reply(`⏭️ Skipped **${current.info.title}**!`);
+    }
 }
 
 export async function stop(message: Message) {
@@ -110,11 +119,13 @@ export async function stop(message: Message) {
         return message.reply('❌ Nothing is playing!');
     }
 
-    // Clear the queue
+    // Clear the queue first
     player.queue.tracks.splice(0, player.queue.tracks.length);
 
     // Stop playback properly without causing crash
-    await player.stopPlaying();
+    if (player.queue.current) {
+        await player.stopPlaying();
+    }
 
     message.reply('⏹️ Stopped playback and cleared the queue!');
 }
