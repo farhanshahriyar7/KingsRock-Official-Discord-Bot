@@ -1,4 +1,3 @@
-// Discord Music Bot - Lavalink-based implementation
 import { config } from 'dotenv';
 config();
 
