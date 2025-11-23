@@ -176,8 +176,8 @@ docs: update documentation
 ## 📈 Roadmap
 
 * [ ] **Minor-Major Updates** (Updating the bot with new features, bug fixes, and performance improvements) — *ToDo*
-* [ ] **Slash Commands Support** (`/play`, `/queue`) — *High Priority*
-* [ ] **Spotify playlist import** (using Spotify API) — *Future Update*
+* ✅ **Slash Commands Support** (`/play`, `/queue`) — *High Priority*
+* ✅ **Spotify playlist import** (using Spotify API) — *Future Update*
 * [ ] **Audio Filters** (Bassboost, Nightcore, 8D) — *Planned*
 * [ ] **Lyrics Integration** (Genius API) — *In Consideration*
 * [ ] **AI-powered song recommendation** (using OpenAI) — *Future Update*
