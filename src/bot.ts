@@ -1,5 +1,5 @@
 import { ActivityType, Client, Message } from 'discord.js';
-import { join, leave, pause, play, queue, resume, skip, stop } from './commands/music';
+import { join, leave, pause, play, queue, resume, skip, stop, loop } from './commands/music';
 import { help, who, rules } from './commands/utility';
 import { initializeLavalink, getManager } from './utils/lavalink';
 
@@ -67,6 +67,8 @@ export class Bot {
                 await resume(message);
             } else if (command === 'queue') {
                 await queue(message);
+            } else if (command === 'loop') {
+                await loop(message, args);
             }
         });
     }

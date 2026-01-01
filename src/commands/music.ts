@@ -1,5 +1,6 @@
-import { Message, GuildMember } from 'discord.js';
+import { Message, GuildMember, EmbedBuilder } from 'discord.js';
 import { getManager } from '../utils/lavalink';
+import { LoopMode, getLoopMode, setLoopMode } from '../utils/loopState';
 
 export async function join(message: Message) {
     const member = message.member as GuildMember;
@@ -177,7 +178,21 @@ export async function queue(message: Message) {
         return message.reply('❌ Queue is empty!');
     }
 
-    let queueMessage = '';
+    // Get current loop mode from player
+    const repeatMode = player.repeatMode || 'off';
+    let loopStatus: string;
+    switch (repeatMode) {
+        case 'track':
+            loopStatus = '🔂 Track Loop';
+            break;
+        case 'queue':
+            loopStatus = '🔁 Queue Loop';
+            break;
+        default:
+            loopStatus = '➡️ No Loop';
+    }
+
+    let queueMessage = `**${loopStatus}**\n\n`;
 
     if (current) {
         queueMessage += `**🎵 Now Playing:**\n${current.info.title} by ${current.info.author}\n`;
@@ -197,6 +212,75 @@ export async function queue(message: Message) {
     }
 
     message.reply(queueMessage || '❌ Queue is empty!');
+}
+
+export async function loop(message: Message, args: string[]) {
+    const manager = getManager();
+    const player = manager.getPlayer(message.guild!.id);
+
+    if (!player) {
+        return message.reply('❌ Nothing is playing!');
+    }
+
+    const guildId = message.guild!.id;
+    const currentMode = getLoopMode(guildId);
+    let newMode: LoopMode;
+
+    // Parse argument or cycle through modes
+    const arg = args[0]?.toLowerCase();
+
+    if (arg === 'track' || arg === 't' || arg === 'song') {
+        newMode = LoopMode.TRACK;
+    } else if (arg === 'queue' || arg === 'q' || arg === 'all') {
+        newMode = LoopMode.QUEUE;
+    } else if (arg === 'off' || arg === 'disable' || arg === 'none') {
+        newMode = LoopMode.OFF;
+    } else if (!arg) {
+        // Cycle through modes: off -> track -> queue -> off
+        if (currentMode === LoopMode.OFF) {
+            newMode = LoopMode.TRACK;
+        } else if (currentMode === LoopMode.TRACK) {
+            newMode = LoopMode.QUEUE;
+        } else {
+            newMode = LoopMode.OFF;
+        }
+    } else {
+        return message.reply('❌ Invalid option! Use: `!loop [track|queue|off]`');
+    }
+
+    // Update our state tracker
+    setLoopMode(guildId, newMode);
+
+    // Use lavalink-client's built-in repeat mode
+    // RepeatMode: 'off' | 'track' | 'queue'
+    await player.setRepeatMode(newMode as 'off' | 'track' | 'queue');
+
+    // Create embed response
+    const embed = new EmbedBuilder()
+        .setTimestamp();
+
+    switch (newMode) {
+        case LoopMode.TRACK:
+            embed
+                .setColor('#00FF00')
+                .setTitle('🔂 Looping Current Track')
+                .setDescription(`Now repeating: **${player.queue.current?.info.title || 'Current track'}**`);
+            break;
+        case LoopMode.QUEUE:
+            embed
+                .setColor('#0099FF')
+                .setTitle('🔁 Queue Loop Activated')
+                .setDescription('The entire queue will repeat when it ends.');
+            break;
+        case LoopMode.OFF:
+            embed
+                .setColor('#FF6600')
+                .setTitle('➡️ Loop Disabled')
+                .setDescription('Playback will continue normally.');
+            break;
+    }
+
+    message.reply({ embeds: [embed] });
 }
 
 function formatDuration(ms: number): string {
