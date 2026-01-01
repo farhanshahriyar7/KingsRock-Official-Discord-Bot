@@ -19,7 +19,8 @@ export async function help(message: Message): Promise<void> {
                     '`!stop` - Stop playback and clear queue\n' +
                     '`!pause` - Pause the current song\n' +
                     '`!resume` - Resume playback\n' +
-                    '`!queue` - Show the current queue',
+                    '`!queue` - Show the current queue\n' +
+                    '`!loop [track|queue|off]` - Set loop mode',
                 inline: false
             },
             {
@@ -46,7 +47,7 @@ export async function who(message: Message): Promise<void> {
     );
 
     const embed = new EmbedBuilder()
-        .setColor('#4B0082')
+        .setColor('#00ccffff')
         .setTitle('👑 Welcome to KingsRock!')
         .setDescription(
             `Welcome to the **KingsRock Official Discord Server**! 🎮\n\n` +

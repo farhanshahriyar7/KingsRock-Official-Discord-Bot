@@ -1,5 +1,6 @@
 import { LavalinkManager } from 'lavalink-client';
 import { Client } from 'discord.js';
+import { clearLoopState } from './loopState';
 
 let manager: LavalinkManager | null = null;
 
@@ -60,6 +61,8 @@ export function initializeLavalink(client: Client): LavalinkManager {
         })
         .on('playerDestroy', (player, reason) => {
             console.log(`Player destroyed in guild ${player.guildId}:`, reason);
+            // Clear loop state when player is destroyed
+            clearLoopState(player.guildId);
         })
         .on('trackStart', (player, track) => {
             if (!track) return;
@@ -68,8 +71,9 @@ export function initializeLavalink(client: Client): LavalinkManager {
                 channel.send(`🎵 Now playing: **${track.info.title}** by **${track.info.author}**`);
             }
         })
-        .on('trackEnd', (player, track, payload) => {
+        .on('trackEnd', async (player, track, payload) => {
             console.log(`Track ended in guild ${player.guildId}`, payload?.reason || '');
+            // Loop handling is now done by lavalink-client's built-in setRepeatMode
         })
         .on('trackError', (player, track, error) => {
             console.error(`❌ Track error in guild ${player.guildId}:`, error);
@@ -97,8 +101,10 @@ export function initializeLavalink(client: Client): LavalinkManager {
                 player.destroy();
             }
         })
-        .on('queueEnd', (player) => {
+        .on('queueEnd', async (player) => {
             const channel = client.channels.cache.get(player.textChannelId!);
+            // Loop handling is now done by lavalink-client's built-in setRepeatMode
+            // This event only fires when loop is off or queue is truly empty
             if (channel && 'send' in channel) {
                 channel.send('✅ Queue finished! Add more songs or I\'ll leave in 5 minutes.');
             }
