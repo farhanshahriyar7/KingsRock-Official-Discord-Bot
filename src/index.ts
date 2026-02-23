@@ -24,6 +24,14 @@ const client = new Client({
     ],
 });
 
-const bot = new Bot(client);
+new Bot(client);
 
-client.login(process.env.DISCORD_TOKEN);
+const token = process.env.DISCORD_TOKEN;
+if (!token) {
+    console.error('DISCORD_TOKEN is not set. Bot login skipped.');
+} else {
+    client.login(token).catch((error) => {
+        console.error('Failed to login to Discord:', error);
+        process.exit(1);
+    });
+}
