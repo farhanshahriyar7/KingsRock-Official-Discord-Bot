@@ -10,11 +10,28 @@ export function initializeLavalink(client: Client): LavalinkManager {
     manager = new LavalinkManager({
         nodes: [
             {
-                id: 'Harmonix V4 Public',
-                host: process.env.LAVALINK_HOST || 'zac.hidencloud.com',
-                port: parseInt(process.env.LAVALINK_PORT || '24627'),
-                authorization: process.env.LAVALINK_PASSWORD || 'Kaun.Yuvraj',
-                secure: false,
+                // Primary node from .env
+                id: 'Primary',
+                host: process.env.LAVALINK_HOST || 'lavalink.jirayu.net',
+                port: parseInt(process.env.LAVALINK_PORT || '13592'),
+                authorization: process.env.LAVALINK_PASSWORD || 'youshallnotpass',
+                secure: process.env.LAVALINK_SECURE === 'true',
+            },
+            {
+                // Fallback node 1
+                id: 'Fallback-1',
+                host: 'lava-v4.ajieblogs.eu.org',
+                port: 443,
+                authorization: 'https://dsc.gg/ajidevserver',
+                secure: true,
+            },
+            {
+                // Fallback node 2
+                id: 'Fallback-2',
+                host: 'lavalink.alfari.id',
+                port: 443,
+                authorization: 'catfein',
+                secure: true,
             }
         ],
         sendToShard: (guildId, payload) => {

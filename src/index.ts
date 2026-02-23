@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { Bot } from './bot';
 
 const client = new Client({
@@ -9,8 +9,12 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildVoiceStates
-    ]
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.DirectMessages,
+    ],
+    partials: [
+        Partials.Channel,
+    ],
 });
 
 const bot = new Bot(client);

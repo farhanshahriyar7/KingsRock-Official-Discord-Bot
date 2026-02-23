@@ -28,7 +28,9 @@ export async function help(message: Message): Promise<void> {
                 value:
                     '`!help` - Show this help message\n' +
                     '`!who` - Learn about KingsRock\n' +
-                    '`!rules` - View server rules',
+                    '`!rules` - View server rules\n' +
+                    '`!recruitment` - Apply for a trial position\n' +
+                    '`!trial-status` - Check your trial application status',
                 inline: false
             }
         )
