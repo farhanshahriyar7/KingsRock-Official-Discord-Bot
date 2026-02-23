@@ -4,22 +4,22 @@ import { supabase } from '../utils/supabase';
 // Status display configuration
 const STATUS_CONFIG: Record<string, { emoji: string; color: number; message: string }> = {
     pending: {
-        emoji: '🟡',
+        emoji: '??',
         color: 0xFEE75C,
         message: 'Your application is **pending** review. Our admins will get to it shortly!',
     },
     reviewed: {
-        emoji: '🔵',
+        emoji: '??',
         color: 0x5865F2,
         message: 'Your application has been **reviewed** by our admins. A decision will be made soon!',
     },
     accepted: {
-        emoji: '🟢',
+        emoji: '??',
         color: 0x57F287,
-        message: '🎉 Congratulations! Your trial application has been **accepted**! Welcome to KingsRock Esports!',
+        message: '?? Congratulations! Your trial application has been **accepted**! Welcome to KingsRock Esports!',
     },
     rejected: {
-        emoji: '🔴',
+        emoji: '??',
         color: 0xED4245,
         message: 'Unfortunately, your application has been **rejected**. Feel free to apply again in the future!',
     },
@@ -31,6 +31,11 @@ const STATUS_CONFIG: Record<string, { emoji: string; color: number; message: str
  * and displays its current status.
  */
 export async function trialStatus(message: Message) {
+    if (!supabase) {
+        await message.reply('? Trial status is currently unavailable. Please contact an admin to configure Supabase.');
+        return;
+    }
+
     // 1. Query Supabase for the user's most recent application
     const { data: application, error } = await supabase
         .from('recruitment_applications')
@@ -43,10 +48,10 @@ export async function trialStatus(message: Message) {
     if (error || !application) {
         const noAppEmbed = new EmbedBuilder()
             .setColor(0x5865F2)
-            .setTitle('📋 Trial Application Status')
+            .setTitle('?? Trial Application Status')
             .setDescription(
                 'You haven\'t submitted a trial application yet.\n\n' +
-                '💡 Use `!recruitment` to apply for a trial position!'
+                '?? Use `!recruitment` to apply for a trial position!'
             )
             .setFooter({ text: 'KingsRock Esports' })
             .setTimestamp();
@@ -79,7 +84,7 @@ export async function trialStatus(message: Message) {
                 }), inline: true
             },
         )
-        .setFooter({ text: 'KingsRock Esports • Status updates are managed by our KR Admins' })
+        .setFooter({ text: 'KingsRock Esports � Status updates are managed by our KR Admins' })
         .setTimestamp();
 
     await message.reply({ embeds: [statusEmbed] });

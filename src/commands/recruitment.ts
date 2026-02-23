@@ -19,9 +19,14 @@ const QUESTION_TIMEOUT = 120_000;
  * 5. Confirms in the channel.
  */
 export async function recruitment(message: Message) {
+    if (!supabase) {
+        await message.reply('? Recruitment is currently unavailable. Please contact an admin to configure Supabase.');
+        return;
+    }
+
     // 1. Must be used in the designated recruitment channel
     if (message.channel.id !== RECRUITMENT_CHANNEL_ID) {
-        await message.reply(`❌ This command can only be used in <#${RECRUITMENT_CHANNEL_ID}>.`);
+        await message.reply(`? This command can only be used in <#${RECRUITMENT_CHANNEL_ID}>.`);
         return;
     }
 
@@ -34,7 +39,7 @@ export async function recruitment(message: Message) {
 
     if (settingsError) {
         console.error('Error fetching recruitment status:', settingsError);
-        await message.reply('❌ An error occurred. Please try again later.');
+        await message.reply('? An error occurred. Please try again later.');
         return;
     }
 
@@ -42,7 +47,7 @@ export async function recruitment(message: Message) {
     if (!isActive) {
         const closedEmbed = new EmbedBuilder()
             .setColor(0xFF4444)
-            .setTitle('🚫 Recruitment Closed')
+            .setTitle('?? Recruitment Closed')
             .setDescription('Recruitment is currently **closed**. Please check back later!')
             .setTimestamp();
         await message.reply({ embeds: [closedEmbed] });
@@ -52,14 +57,14 @@ export async function recruitment(message: Message) {
     // 3. Try to DM the user
     const dmChannel = await message.author.createDM().catch(() => null);
     if (!dmChannel) {
-        await message.reply('❌ I couldn\'t send you a DM. Please make sure your DMs are open and try again.');
+        await message.reply('? I couldn\'t send you a DM. Please make sure your DMs are open and try again.');
         return;
     }
 
     // Notify in channel
     const startEmbed = new EmbedBuilder()
         .setColor(0x5865F2)
-        .setTitle('📬 Recruitment Application Started')
+        .setTitle('?? Recruitment Application Started')
         .setDescription(`${message.author}, check your DMs! I've sent you the application form.`)
         .setTimestamp();
     await message.reply({ embeds: [startEmbed] });
@@ -75,14 +80,14 @@ export async function recruitment(message: Message) {
 
     const introEmbed = new EmbedBuilder()
         .setColor(0x5865F2)
-        .setTitle('👑 KingsRock Esports — Recruitment Application')
+        .setTitle('?? KingsRock Esports - Recruitment Application')
         .setDescription(
             'Welcome! Please answer the following questions to submit your trial application.\n\n' +
-            '• You have **2 minutes** per question.\n' +
-            '• Type **"cancel"** at any time to abort.\n' +
-            '• Type **"skip"** to skip optional questions.\n\n' +
-            '━━━━━━━━━━━━━━━━━━━\n' +
-            'Let\'s get started! 🚀'
+            '- You have **2 minutes** per question.\n' +
+            '- Type **"cancel"** at any time to abort.\n' +
+            '- Type **"skip"** to skip optional questions.\n\n' +
+            '-------------------\n' +
+            'Let\'s get started! ??'
         )
         .setFooter({ text: 'KingsRock Esports Recruitment' })
         .setTimestamp();
@@ -105,14 +110,14 @@ export async function recruitment(message: Message) {
             const response = collected.first()?.content.trim();
 
             if (!response || response.toLowerCase() === 'cancel') {
-                await dmChannel.send('❌ Application cancelled.');
+                await dmChannel.send('? Application cancelled.');
                 return;
             }
 
             if (response.toLowerCase() === 'skip' && !q.required) {
                 answers[q.key] = null;
             } else if (response.toLowerCase() === 'skip' && q.required) {
-                await dmChannel.send('⚠️ This field is required and cannot be skipped. Please provide an answer.');
+                await dmChannel.send('?? This field is required and cannot be skipped. Please provide an answer.');
                 // Re-ask the same question
                 const retryCollected = await dmChannel.awaitMessages({
                     filter: (m) => m.author.id === message.author.id,
@@ -122,7 +127,7 @@ export async function recruitment(message: Message) {
                 });
                 const retryResponse = retryCollected.first()?.content.trim();
                 if (!retryResponse || retryResponse.toLowerCase() === 'cancel') {
-                    await dmChannel.send('❌ Application cancelled.');
+                    await dmChannel.send('? Application cancelled.');
                     return;
                 }
                 answers[q.key] = retryResponse;
@@ -130,7 +135,7 @@ export async function recruitment(message: Message) {
                 answers[q.key] = response;
             }
         } catch {
-            await dmChannel.send('⏰ You took too long to respond. Application cancelled.');
+            await dmChannel.send('? You took too long to respond. Application cancelled.');
             return;
         }
     }
@@ -153,14 +158,14 @@ export async function recruitment(message: Message) {
 
     if (insertError) {
         console.error('Error saving recruitment application:', insertError);
-        await dmChannel.send('❌ There was an error submitting your application. Please try again later.');
+        await dmChannel.send('? There was an error submitting your application. Please try again later.');
         return;
     }
 
     // 6. Confirm via DM
     const confirmEmbed = new EmbedBuilder()
         .setColor(0x57F287)
-        .setTitle('✅ Application Submitted Successfully!')
+        .setTitle('? Application Submitted Successfully!')
         .setDescription('Your trial application has been submitted to KingsRock Esports. Our admins will review it shortly.')
         .addFields(
             { name: 'Surname', value: answers.surname || '_Skipped_', inline: true },
@@ -169,7 +174,7 @@ export async function recruitment(message: Message) {
             { name: 'Rank', value: answers.rank || '_Skipped_', inline: true },
             { name: 'Tracker', value: answers.tracker_link || '_Skipped_', inline: false },
         )
-        .setFooter({ text: 'KingsRock Esports • Good luck!' })
+        .setFooter({ text: 'KingsRock Esports - Good luck!' })
         .setTimestamp();
 
     await dmChannel.send({ embeds: [confirmEmbed] });
@@ -177,7 +182,7 @@ export async function recruitment(message: Message) {
     // 7. Confirm in the recruitment channel
     const channelConfirmEmbed = new EmbedBuilder()
         .setColor(0x57F287)
-        .setTitle('📋 New Recruitment Application')
+        .setTitle('?? New Recruitment Application')
         .setDescription(`${message.author} has submitted a trial application!`)
         .addFields(
             { name: 'IGN', value: answers.ign!, inline: true },
